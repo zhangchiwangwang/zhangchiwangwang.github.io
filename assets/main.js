@@ -46,3 +46,34 @@
     if (e.key === 'ArrowRight') show(cur + 1);
   });
 })();
+
+/* homepage media carousel — auto-rotate, arrows, dots; each slide links to its page */
+(function () {
+  var car = document.querySelector('.car');
+  if (!car) return;
+  var slides = car.querySelectorAll('.car-slide'),
+      dotsWrap = car.querySelector('.car-dots'),
+      idx = 0, timer = null;
+  slides.forEach(function (s, i) {
+    var d = document.createElement('button');
+    d.className = 'car-dot' + (i === 0 ? ' on' : '');
+    d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    d.addEventListener('click', function (e) { e.preventDefault(); go(i); restart(); });
+    dotsWrap.appendChild(d);
+  });
+  var dots = dotsWrap.querySelectorAll('.car-dot');
+  function go(i) {
+    idx = (i + slides.length) % slides.length;
+    slides.forEach(function (s, k) { s.classList.toggle('on', k === idx); });
+    dots.forEach(function (d, k) { d.classList.toggle('on', k === idx); });
+  }
+  function restart() {
+    clearInterval(timer);
+    timer = setInterval(function () { go(idx + 1); }, 4000);
+  }
+  car.querySelector('.car-prev').addEventListener('click', function (e) { e.preventDefault(); go(idx - 1); restart(); });
+  car.querySelector('.car-next').addEventListener('click', function (e) { e.preventDefault(); go(idx + 1); restart(); });
+  car.addEventListener('mouseenter', function () { clearInterval(timer); });
+  car.addEventListener('mouseleave', restart);
+  go(0); restart();
+})();
